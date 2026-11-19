@@ -1,0 +1,77 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"C:/DEV/tdd-harness/ship/scripts/archive_session.py\"",
+            "timeout": 10,
+            "statusMessage": "입력한 프롬프트를 기록합니다"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"C:/DEV/tdd-harness/ship/scripts/archive_session.py\"",
+            "timeout": 10,
+            "statusMessage": "실행한 명령과 결과를 기록합니다"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"C:/DEV/tdd-harness/ship/scripts/archive_session.py\"",
+            "timeout": 10,
+            "statusMessage": "응답과 Transcript 를 저장합니다"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"C:/DEV/tdd-harness/ship/scripts/archive_session.py\"",
+            "timeout": 10,
+            "statusMessage": "대화 압축 전에 Transcript 를 보관합니다"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"C:/DEV/tdd-harness/ship/scripts/archive_session.py\"",
+            "timeout": 10,
+            "statusMessage": "새 세션을 기록합니다"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"C:/DEV/tdd-harness/ship/scripts/archive_session.py\"",
+            "timeout": 10,
+            "statusMessage": "세션 종료 표시를 남깁니다"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "pytest: 단위 테스트 (골든 제외)",
+      "type": "shell",
+      "command": "python -m pytest -q -m \"not golden\"",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "pytest: 전체 (회귀 · 골든 포함)",
+      "type": "shell",
+      "command": "python -m pytest -q",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "pytest: 골든 마스터만",
+      "type": "shell",
+      "command": "python -m pytest -q -m golden",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Sanity (README 사용 예 포함)",
+      "type": "shell",
+      "command": "python scripts/sanity.py --readme",
+      "problemMatcher": []
+    },
+    {
+      "label": "git: 커밋 이력 (그래프)",
+      "type": "shell",
+      "command": "git log --oneline --graph -n 15",
+      "problemMatcher": []
+    },
+    {
+      "label": "git: 상태 확인 (go 전에)",
+      "type": "shell",
+      "command": "git status --short --branch",
+      "problemMatcher": []
+    }
+  ]
+}

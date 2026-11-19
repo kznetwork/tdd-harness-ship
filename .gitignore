@@ -1,0 +1,8 @@
+# 실행 기록 · 도구 캐시는 저장소에 올리지 않는다
+logs/
+docs/Prompt/
+__pycache__/
+.pytest_cache/
+.hypothesis/
+.venv/
+tests/golden/*.received.txt
