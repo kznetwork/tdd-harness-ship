@@ -83,6 +83,7 @@ def _build(tmp_path):
         src = ROOT / "scripts" / name
         if src.exists():
             shutil.copy(src, tmp_path / "scripts" / name)
+    shutil.copy(ROOT / "tests" / "test_golden_master.py", tmp_path / "tests" / "test_golden_master.py")
     shutil.copy(ROOT / "pytest.ini", tmp_path / "pytest.ini")
     shutil.copy(ROOT / "conftest.py", tmp_path / "conftest.py")
     (tmp_path / "plan.md").write_text(PLAN, encoding="utf-8")
@@ -223,3 +224,59 @@ def test_red_refuses_when_the_harness_itself_was_changed(repo):
         f.write("\n# 규칙을 우회하려고 하네스를 고쳤다\n")
     rc, out = tdd(repo, "red", "TC-1")
     assert rc == 1 and "하네스" in out and "커밋된 상태와 다릅니다" in out
+
+
+# ------------------------------------------------------------------ golden
+def reach_green(repo):
+  tdd(repo, "next")
+  (repo / "tests" / "test_fee.py").write_text(TEST_FAIL, encoding="utf-8")
+  tdd(repo, "red", "TC-1")
+  (repo / "shipping.py").write_text(GOOD, encoding="utf-8")
+  rc, out = tdd(repo, "green", "TC-1")
+  assert rc == 0, out
+
+
+def test_golden_requires_green_first(repo):
+  tdd(repo, "next")
+  rc, out = tdd(repo, "golden", "TC-1")
+  assert rc == 1 and "GREEN 증거가 없습니다" in out
+
+
+def test_golden_proposes_rows_and_waits_for_approval(repo):
+  reach_green(repo)
+  before = len(subjects(repo))
+  rc, out = tdd(repo, "golden", "TC-1")
+  assert rc == 3 and "[제안] CT-1 동작 3행" in out and "[승인 대기]" in out
+  assert evidence(repo)["golden"]["status"] == "승인 대기"
+  assert not (repo / "tests" / "golden" / "approved.txt").exists()
+  assert len(subjects(repo)) == before
+
+
+def test_golden_approves_rows_and_commits(repo):
+  reach_green(repo)
+  tdd(repo, "golden", "TC-1")
+  rc, out = tdd(repo, "golden", "TC-1", "--approve")
+  assert rc == 0, out
+  assert "[OK] 승인 3행" in out
+  assert evidence(repo)["golden"]["status"] == "승인"
+  assert subjects(repo)[0] == "test(golden): CT-1 동작 3행 승인 [APPROVED]"
+  approved = (repo / "tests" / "golden" / "approved.txt").read_text(encoding="utf-8")
+  assert "CT-1 | 1 | 3000" in approved
+
+
+def test_golden_refuses_drift_in_an_approved_row(repo):
+  reach_green(repo)
+  tdd(repo, "golden", "TC-1", "--approve")
+  (repo / "shipping.py").write_text(STUB, encoding="utf-8")
+  rc, out = tdd(repo, "golden", "TC-1")
+  assert rc == 1 and "이미 승인한 동작이 바뀌었습니다 (회귀)" in out
+
+
+def test_golden_does_not_commit_when_there_are_no_new_rows(repo):
+  reach_green(repo)
+  tdd(repo, "golden", "TC-1", "--approve")
+  before = len(subjects(repo))
+  rc, out = tdd(repo, "golden", "TC-1")
+  assert rc == 0 and "새로 승인할 행이 없습니다" in out
+  assert evidence(repo)["golden"]["status"] == "새 행 없음"
+  assert len(subjects(repo)) == before
